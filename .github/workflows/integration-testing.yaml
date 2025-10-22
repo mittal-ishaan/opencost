@@ -25,7 +25,8 @@ jobs:
           ismaintainer: ${{ steps.determine-maintainer.outputs.ismaintainer }}
       steps:
         - name: Check team membership
-          uses: tspascoal/get-user-teams-membership@v2
+          uses: tspascoal/get-user-teams-membership@v3
+          if: ${{ github.actor != 'dependabot[bot]' }}
           id: teamAffiliation
           with:
             GITHUB_TOKEN: ${{ secrets.ORG_READER_PAT }}
@@ -220,7 +221,7 @@ jobs:
            
     hold-on-failure:
       needs: [wait_for_image_ready, run-tests, run-comparison-tests]
-      if: ${{ always() && (needs.run-tests.outputs.passed == 'false' || needs.run-comparison-tests.outputs.passed == 'false')}} 
+      if: ${{ always() && (needs.run-tests.outputs.passed == 'false' || needs.run-comparison-tests.outputs.passed == 'false') && github.event_name != 'merge_group'}} 
       runs-on: ubuntu-latest
       permissions: {}
       steps:
